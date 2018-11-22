@@ -32,12 +32,18 @@ class NeuralNetwork():
 
             self.synaptic_weights += adjustments
 
+    def hiddenInput(self, output):
+        # Hidden input with 4 inputs
+        output[output > 0.5] = 1
+        return output
+
     def think(self, inputs):
         #passing the inputs via the neuron to get output   
         #converting values to floats
         
         inputs = inputs.astype(float)
         output = self.sigmoid(np.dot(inputs, self.synaptic_weights))
+        output = self.hiddenInput(output)
         return output
 
 
@@ -49,15 +55,26 @@ if __name__ == "__main__":
     print("Beginning Randomly Generated Weights: ")
     print(neural_network.synaptic_weights)
 
-    training_inputs = np.array([[0,0,1,0],
-                                [1,1,1,0],
-                                [1,0,1,1],
-                                [0,1,1,0],
+    # all 16 possibilites for 4 inputs in training inputs
+    training_inputs = np.array([[0,0,0,0],
                                 [1,0,0,0],
+                                [0,1,0,0],
+                                [0,0,1,0],
+                                [0,0,0,1],
+                                [1,1,0,0],
+                                [0,1,1,0],
+                                [0,0,1,1],
+                                [1,0,0,1],
                                 [0,1,0,1],
-                                [0,0,0,0]])
+                                [1,0,1,0],
+                                [1,1,1,0],
+                                [0,1,1,1],
+                                [1,0,1,1],
+                                [1,1,0,1],
+                                [1,1,1,1]])
 
-    training_outputs = np.array([[0,1,1,0,1,0,0]]).T
+    # the anwers of all 16 possibilites (first number)
+    training_outputs = np.array([[0,1,0,0,0,1,0,0,1,0,1,1,0,1,1,1]]).T
 
     #training taking place
     neural_network.train(training_inputs, training_outputs, 50000)
@@ -73,11 +90,8 @@ if __name__ == "__main__":
         print("\nConsidering New Situation: ", user_input_one, user_input_two, user_input_three, user_input_four)
         output = neural_network.think(np.array([user_input_one, user_input_two, user_input_three, user_input_four]))
 
-        if 0.00 <= output <= 0.05:
+        if int(output) == user_input_one:
             print("New Output data:\n" + str(int(output)))
-            print("Wow, we did it!\n")
-        elif 1.00 >= output >= 0.99:
-            print("New Output data:\n" + str(int(output)+1))
             print("Wow, we did it!\n")
         else:
             print("New Output data:\n" + str(output))
